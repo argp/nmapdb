@@ -30,6 +30,7 @@ def usage(name):
     print "     (-v) --verbose      verbose output"
     print "     (-c) --create       specify input SQL file to create SQLite DB"
     print "     (-d) --database     specify output SQLite DB file"
+    print "     (-f) --frequency    list most frequent open ports from specified DB"
     print "     (-n) --nodb         do not perform any DB operations (i.e. dry run)"
     print "     (-V) --version      output version number and exit"
 
@@ -38,6 +39,7 @@ def usage(name):
 def main(argv, environ):
     global vflag
     nodb_flag = false
+    freq_flag = false
     db_path = DEFAULT_DATABASE
     sql_file = ""
     argc = len(argv)
@@ -47,8 +49,9 @@ def main(argv, environ):
         sys.exit(0)
  
     try:
-        alist, args = getopt.getopt(argv[1:], "hvd:c:nV",
-                ["help", "verbose", "database=", "create=", "nodb", "version"])
+        alist, args = getopt.getopt(argv[1:], "hvd:c:f:nV",
+                ["help", "verbose", "database=", "create=", "frequency=",
+                 "nodb", "version"])
     except getopt.GetoptError, msg:
         print "%s: %s\n" % (argv[0], msg)
         usage(argv[0]);
@@ -64,6 +67,9 @@ def main(argv, environ):
             db_path = val
         if field in ("-c", "--create"):
             sql_file = val
+        if field in ("-f", "--frequency"):
+            freq_flag = true
+            db_path = val
         if field in ("-n", "--nodb"):
             nodb_flag = true
         if field in ("-V", "--version"):
@@ -71,9 +77,10 @@ def main(argv, environ):
             print "parse nmap's XML output files and insert them into an SQLite database"
             sys.exit(0)
 
-    if len(args[0]) == 0:
-        usage(argv[0])
-        sys.exit(1)
+    if freq_flag == false:
+        if len(args[0]) == 0:
+            usage(argv[0])
+            sys.exit(1)
 
     if nodb_flag == false:
         if db_path == DEFAULT_DATABASE:
@@ -83,6 +90,18 @@ def main(argv, environ):
         cursor = conn.cursor()
 
         myprint("%s: successfully connected to SQLite DB \"%s\"\n" % (argv[0], db_path))
+
+        # helpful queries on the database
+        if freq_flag == true:
+            freq_sql = "select count(port) as frequency,port as fport from ports where ports.state='open' group by port having count(fport) > 1000"
+
+            cursor.execute(freq_sql)
+            print "Frequency|Port"
+
+            for row in cursor:
+                print(row)
+            
+            sys.exit(0)
 
     if nodb_flag == false:
         if sql_file != "":
