@@ -1,6 +1,6 @@
 /*
  * nmapdb - Parse nmap's XML output files and insert them into an SQLite database
- * Copyright (c) 2009 Patroklos Argyroudis <argp at domain census-labs.com>
+ * Copyright (c) 2012 Patroklos Argyroudis <argp at domain census-labs.com>
  */
 
 CREATE TABLE IF NOT EXISTS hosts (
@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS hosts (
     os_gen      TEXT,
     last_update TIMESTAMP,
     state       VARCHAR(8) DEFAULT 'down',
-    mac_vendor  TEXT
+    mac_vendor  TEXT,
+    whois       TEXT
 );
 
 CREATE TABLE IF NOT EXISTS ports (
