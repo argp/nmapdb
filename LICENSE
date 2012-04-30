@@ -1,7 +1,7 @@
   nmapdb - Parse nmap's XML output files and insert them into an SQLite database
 
-  Copyright (c) 2009 Patroklos Argyroudis <argp at domain census-labs.com>
-  Copyright (c) 2009 Census, Inc.
+  Copyright (c) 2012 Patroklos Argyroudis <argp at domain census-labs.com>
+  Copyright (c) 2012 Census, Inc.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
