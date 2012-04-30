@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # nmapdb - Parse nmap's XML output files and insert them into an SQLite database
-# Copyright (c) 2009 Patroklos Argyroudis <argp at domain census-labs.com>
+# Copyright (c) 2012 Patroklos Argyroudis <argp at domain census-labs.com>
 
 import sys
 import os
@@ -9,7 +9,7 @@ import getopt
 import xml.dom.minidom
 from pysqlite2 import dbapi2 as sqlite
 
-VERSION = "1.1"
+VERSION = "1.2"
 DEFAULT_DATABASE = "./nmapdb.db"
 
 true = 1
@@ -173,6 +173,17 @@ def main(argv, environ):
             except:
                 timestamp = ""
 
+            try:
+                hostscript = host.getElementsByTagName("hostscript")[0]
+                script = hostscript.getElementsByTagName("script")[0]
+                id = script.getAttribute("id")
+
+                if id == "whois":
+                    whois_str = script.getAttribute("output")
+
+            except:
+                whois_str = ""
+
             myprint("================================================================")
 
             myprint("[hosts] ip:\t\t%s" % (ip))
@@ -185,13 +196,15 @@ def main(argv, environ):
             myprint("[hosts] os_gen:\t\t%s" % (os_gen))
             myprint("[hosts] last_update:\t%s" % (timestamp))
             myprint("[hosts] state:\t\t%s" % (state))
-            myprint("[hosts] mac_vendor\t%s" % (mac_vendor))
+            myprint("[hosts] mac_vendor:\t%s" % (mac_vendor))
+            myprint("[hosts] whois:\n")
+            myprint("%s\n" % (whois_str))
 
             if nodb_flag == false:
                 try:
-                    cursor.execute("INSERT INTO hosts VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    cursor.execute("INSERT INTO hosts VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             (ip, mac, hostname, protocol, os_name, os_family, os_accuracy,
-                            os_gen, timestamp, state, mac_vendor))
+                            os_gen, timestamp, state, mac_vendor, whois_str))
                 except sqlite.IntegrityError, msg:
                     print "%s: warning: %s: table hosts: ip: %s\n" % (argv[0], msg, ip)
                     continue
@@ -215,9 +228,17 @@ def main(argv, environ):
                 try:
                     service = port.getElementsByTagName("service")[0]
                     port_name = service.getAttribute("name")
+                    product_descr = service.getAttribute("product")
+                    product_ver = service.getAttribute("version")
+                    product_extra = service.getAttribute("extrainfo")
                 except:
                     service = ""
                     port_name = ""
+                    product_descr = ""
+                    product_ver = ""
+                    product_extra = ""
+                    
+                service_str = "%s %s %s" % (product_descr, product_ver, product_extra)
 
                 myprint("\t------------------------------------------------")
 
@@ -226,12 +247,12 @@ def main(argv, environ):
                 myprint("\t[ports] protocol:\t%s" % (protocol))
                 myprint("\t[ports] name:\t\t%s" % (port_name))
                 myprint("\t[ports] state:\t\t%s" % (state))
-                myprint("\t[ports] service:\t")
+                myprint("\t[ports] service:\t%s" % (service_str))
 
                 if nodb_flag == false:
                     try:
-                        cursor.execute("INSERT INTO ports VALUES (?, ?, ?, ?, ?, NULL)",
-                                (ip, pn, protocol, port_name, state))
+                        cursor.execute("INSERT INTO ports VALUES (?, ?, ?, ?, ?, ?)",
+                                (ip, pn, protocol, port_name, state, service_str))
                     except sqlite.IntegrityError, msg:
                         print "%s: warning: %s: table ports: ip: %s\n" % (argv[0], msg, ip)
                         continue
