@@ -242,18 +242,19 @@ def main(argv, environ):
                     
                 service_str = "%s %s %s" % (product_descr, product_ver, product_extra)
 
-                try:
-                    script = port.getElementsByTagName("script")[0]
-                    script_id = script.getAttribute("id")
-                    script_output = script.getAttribute("output")
-                except:
-                    script_id = ""
-                    script_output = ""
+                info_str = ""
 
-                if script_id != "" and script_output != "":
-                    info_str = "%s: %s" % (script_id, script_output)
-                else:
-                    info_str = ""
+                for i in (0, 1):
+                    try:
+                        script = port.getElementsByTagName("script")[i]
+                        script_id = script.getAttribute("id")
+                        script_output = script.getAttribute("output")
+                    except:
+                        script_id = ""
+                        script_output = ""
+
+                    if script_id != "" and script_output != "":
+                        info_str += "%s: %s\n" % (script_id, script_output)
 
                 myprint("\t------------------------------------------------")
 
