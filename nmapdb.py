@@ -180,6 +180,8 @@ def main(argv, environ):
 
                 if id == "whois":
                     whois_str = script.getAttribute("output")
+                else:
+                    whois_str = ""
 
             except:
                 whois_str = ""
@@ -240,6 +242,19 @@ def main(argv, environ):
                     
                 service_str = "%s %s %s" % (product_descr, product_ver, product_extra)
 
+                try:
+                    script = port.getElementsByTagName("script")[0]
+                    script_id = script.getAttribute("id")
+                    script_output = script.getAttribute("output")
+                except:
+                    script_id = ""
+                    script_output = ""
+
+                if script_id != "" and script_output != "":
+                    info_str = "%s: %s" % (script_id, script_output)
+                else:
+                    info_str = ""
+
                 myprint("\t------------------------------------------------")
 
                 myprint("\t[ports] ip:\t\t%s" % (ip))
@@ -248,11 +263,14 @@ def main(argv, environ):
                 myprint("\t[ports] name:\t\t%s" % (port_name))
                 myprint("\t[ports] state:\t\t%s" % (state))
                 myprint("\t[ports] service:\t%s" % (service_str))
+                
+                if info_str != "":
+                    myprint("\t[ports] info:\n")
+                    myprint("%s\n" % (info_str))
 
                 if nodb_flag == false:
                     try:
-                        cursor.execute("INSERT INTO ports VALUES (?, ?, ?, ?, ?, ?)",
-                                (ip, pn, protocol, port_name, state, service_str))
+                        cursor.execute("INSERT INTO ports VALUES (?, ?, ?, ?, ?, ?, ?)", (ip, pn, protocol, port_name, state, service_str, info_str))
                     except sqlite.IntegrityError, msg:
                         print "%s: warning: %s: table ports: ip: %s\n" % (argv[0], msg, ip)
                         continue
