@@ -155,11 +155,11 @@ def main(argv, environ):
                 state = ""
 
             try:
-                os = host.getElementsByTagName("os")[0]
-                os_match = os.getElementsByTagName("osmatch")[0]
+                os_el = host.getElementsByTagName("os")[0]
+                os_match = os_el.getElementsByTagName("osmatch")[0]
                 os_name = os_match.getAttribute("name")
                 os_accuracy = os_match.getAttribute("accuracy")
-                os_class = os.getElementsByTagName("osclass")[0]
+                os_class = os_el.getElementsByTagName("osclass")[0]
                 os_family = os_class.getAttribute("osfamily")
                 os_gen = os_class.getAttribute("osgen")
             except:
