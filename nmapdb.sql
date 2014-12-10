@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS ports (
     name        VARCHAR(33),
     state       VARCHAR(33) DEFAULT 'closed',
     service     TEXT,
+    info        TEXT,
     PRIMARY KEY (ip, port, protocol),
     CONSTRAINT fk_ports_hosts FOREIGN KEY (ip) REFERENCES hosts(ip) ON DELETE CASCADE
 );

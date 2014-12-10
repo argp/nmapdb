@@ -1,6 +1,3 @@
-* Add realvnc-auth-bypass.nse and vnc-brute.nse support to the
-  database and the parser
-
 * Helpful SQL queries on a database (e.g. open port frequency)
 
 * Add the MySQL support submitted by @antonat
